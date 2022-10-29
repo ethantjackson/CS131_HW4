@@ -44,4 +44,40 @@ public:
   }
 };
 
-2.
+2. a) Garbage collection languages are not ideal for real time applications with strict
+timings, as garbage collection halts program execution at unpredictable times (e.g. when
+there is memory pressure). Automatic garbage collection is a relatively slow operation,
+and combined with its unpredictability can cause key real-time need to not be met.
+
+b) Reference counting slows program execution, effectively multiplying the number of
+operations by at least 2. This slow down will make it harder to achieve tight real-time
+goals.
+
+c) I would suggest using Go (mark-and-sweep). Seeing that the coord lengths are random
+(not all the same length), there will not be substantial fragmentation. As such, we
+should opt for mark-and-sweep so as not to incur the substantial cost of copying the
+coords in the compact step for C#.
+
+d) File descriptors are only freed via cleanupFd(), which is only called in the 
+RoomView destructor. Since Yvonne's M3 Macbook may have much available RAM, it may not
+experience memory pressure frequently. As such, garbage collection may be performed 
+(and cleanupFd called) much after the fd table runs out of space. 
+
+3. a) Pass by reference or pass by object reference can be used here. The x and y
+values are mutated across function calls, meaning that arguments must refer to the same
+memory that the passed-in arguments refer to. 
+
+b) Pass by value. With this paradigm, functions effectively create their own copy of
+the passed in variables with the same values. x and y remain unchanged at their
+original memory locations as seen in the print statements.
+
+c) Assuming pass-by-value passes in a shallow copy of the argument, print(x.x) will
+output 5 in either paradigm. With pass-by-value, although the x within func refers to
+a different memory object than x outside fo func, both X instances refer to the same
+x member object in memory. Thus, changing x's value in func will also change x's value
+outside of func.
+
+4. Only line 4 uses a conversion (as evidenced by the use of the 0 register). The
+other lines use casts. Regarding conversions, the C++ compiler moves the stack value
+to another register. It then performs the necessary operations on this register to
+convert the value to the desired type.
