@@ -1,0 +1,47 @@
+1. 
+class my_shared_ptr
+{
+private:
+  int * ptr = nullptr;
+  unsigned int * refCount = nullptr; // a)
+
+public:
+  // b) constructor
+  my_shared_ptr(int * ptr)
+  {
+    this->ptr = ptr;
+    this->refCount = new unsigned int(1);
+  }
+  
+  // c) copy constructor
+  my_shared_ptr(const my_shared_ptr & other)
+  {
+    this->ptr = other.ptr;
+    this->refCount = other.refCount;
+    (*refCount)++;
+  }
+
+  // d) destructor
+  ~my_shared_ptr()
+  {
+    (*refCount)--;
+    if (*refCount == 0)
+      delete ptr;
+  }
+
+  // e) copy assignment
+  my_shared_ptr& operator=(const my_shared_ptr & obj)
+  {
+    (*refCount)--;
+    if (*refCount == 0) {
+        delete ptr;
+    }
+    
+    this->ptr = obj.ptr;
+    this->refCount = obj.refCount;
+    (*refCount)++;
+    return *this;
+  }
+};
+
+2.
